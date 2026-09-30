@@ -1,32 +1,80 @@
+import semi_file_1
+
+
 def display_customers(l):
-    
-    if len(l) == 1:
-        print("No customers to display.")
-        return
-    
-    for customer in l:
-        print("Customer ID:", customer[0])
-        print("Customer Name:", customer[1])
-        print("Customer Address:", customer[2])
-        print("Customer Phone:", customer[3])
-        print("Customer Email:", customer[4])
-        print("Account Number:", customer[5])
-        print("Account Type:", customer[6])
-        print("Account Balance:", customer[7])
-        print("-----------------------------")
-    
+    semi_file_1.display_customers(l)
+
+
 def update_customer(l):
-    customer_id = input("Enter the customer ID to update: ")
-    for customer in l:
-        if customer[0] == customer_id:
-            print("Updating details for customer ID:", customer_id)
-            customer[1] = input("Enter new customer name: ")
-            customer[2] = input("Enter new customer address: ")
-            customer[3] = int(input("Enter new customer phone: "))
-            customer[4] = input("Enter new customer email: ")
-            customer[5] = input("Enter new account number: ")
-            customer[6] = input("Enter new account type: ")
-            customer[7] = float(input("Enter new account balance: "))
-            print("Customer details updated successfully.")
+    return semi_file_1.update_customer(l)
+
+
+def search_customer(l):
+    customer_id = input("Enter the customer ID to search: ").strip()
+    if semi_file_1.should_exit(customer_id):
+        print("Search cancelled.")
+        return
+    for customer in semi_file_1._normalize_customers(l):
+        if customer.get("customer_id") == customer_id:
+            print("Customer found:")
+            print(customer)
             return
-    print("No customer found with ID ", customer_id, ".")
+    print(f"No customer found with ID {customer_id}.")
+
+
+def deposit_money(l):
+    customer_id = input("Enter the customer ID: ").strip()
+    if semi_file_1.should_exit(customer_id):
+        print("Deposit cancelled.")
+        return
+    for customer in semi_file_1._normalize_customers(l):
+        if customer.get("customer_id") == customer_id:
+            while True:
+                amount_input = input("Enter amount to deposit: ").strip()
+                if semi_file_1.should_exit(amount_input):
+                    print("Deposit cancelled.")
+                    return
+                try:
+                    amount = float(amount_input)
+                    if amount <= 0:
+                        raise ValueError
+                    break
+                except ValueError:
+                    print("Deposit amount must be a positive number.")
+
+            customer["account_balance"] = customer.get("account_balance", 0.0) + amount
+            semi_file_1.save_customers(l, semi_file_1.DEFAULT_STORAGE_PATH)
+            print(f"Deposit successful. New balance: {customer['account_balance']}")
+            return
+    print(f"No customer found with ID {customer_id}.")
+
+
+def withdraw_money(l):
+    customer_id = input("Enter the customer ID: ").strip()
+    if semi_file_1.should_exit(customer_id):
+        print("Withdrawal cancelled.")
+        return
+    for customer in semi_file_1._normalize_customers(l):
+        if customer.get("customer_id") == customer_id:
+            while True:
+                amount_input = input("Enter amount to withdraw: ").strip()
+                if semi_file_1.should_exit(amount_input):
+                    print("Withdrawal cancelled.")
+                    return
+                try:
+                    amount = float(amount_input)
+                    if amount <= 0:
+                        raise ValueError
+                    break
+                except ValueError:
+                    print("Withdrawal amount must be a positive number.")
+
+            if amount > customer.get("account_balance", 0.0):
+                print("Insufficient balance for this withdrawal.")
+                return
+
+            customer["account_balance"] = customer.get("account_balance", 0.0) - amount
+            semi_file_1.save_customers(l, semi_file_1.DEFAULT_STORAGE_PATH)
+            print(f"Withdrawal successful. New balance: {customer['account_balance']}")
+            return
+    print(f"No customer found with ID {customer_id}.")

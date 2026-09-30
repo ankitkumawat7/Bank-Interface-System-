@@ -1,0 +1,10 @@
+{
+  "customer_id": "C001",
+  "customer_name": "Alice Updated",
+  "customer_address": "New Street",
+  "customer_phone": 9876543210,
+  "customer_email": "alice.new@example.com",
+  "account_number": "ACC999",
+  "account_type": "Checking",
+  "account_balance": 9159.75
+}
